@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCX 160 CBS - Maintenance Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF0000;
+            --secondary: #1a1a1a;
+            --accent: #FFD700;
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #888888;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3333;
+            --border: #333333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 0, 0, 0.1) 100%);
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 0, 0, 0.1) 50%, transparent 60%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.2);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .stat-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .update-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #cc0000);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .update-btn:active {
+            transform: translateY(0);
+        }
+
+        .maintenance-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .maintenance-section.overdue {
+            border-color: var(--danger);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 51, 51, 0.1) 100%);
+            animation: pulse 2s infinite;
+        }
+
+        .maintenance-section.due-soon {
+            border-color: var(--warning);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 170, 0, 0.1) 100%);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(255, 51, 51, 0); }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .km-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.ok {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-badge.warning {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-badge.danger {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+        }
+
+        .checklist-item.completed {
+            opacity: 0.6;
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+        }
+
+        .checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox:hover {
+            border-color: var(--primary);
+        }
+
+        .checkbox:checked {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-color: var(--primary);
+        }
+
+        .checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .checklist-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .daily-checklist {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 0, 0, 0.1) 100%);
+            border: 2px solid var(--accent);
+        }
+
+        .alert-box {
+            background: linear-gradient(135deg, rgba(255, 51, 51, 0.2) 0%, rgba(255, 0, 0, 0.1) 100%);
+            border: 2px solid var(--danger);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 2rem;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .alert-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 5px;
+            color: var(--danger);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            border-top: 2px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .last-updated {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .maintenance-section {
+                padding: 20px;
+            }
+        }
+
+        .reset-btn {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .reset-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .km-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .info-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            color: var(--secondary);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+            transition: transform 0.3s ease;
+        }
+
+        .info-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--secondary);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏍️ PCX 160 CBS</h1>
+            <p class="subtitle">Maintenance Tracker & Reminder System</p>
+        </header>
+
+        <div id="alerts"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Kilometer Saat Ini</div>
+                <input type="number" id="currentKm" class="stat-input" placeholder="0" min="0">
+                <button class="update-btn" onclick="updateKm()">Update KM</button>
+                <div class="last-updated" id="lastKmUpdate"></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Total Perawatan Selesai</div>
+                <div class="stat-value" id="completedCount">0</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="overallProgress"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Perawatan Mendatang</div>
+                <div class="stat-value" id="upcomingCount">0</div>
+                <div class="stat-label" style="margin-top: 15px; font-size: 0.8rem;" id="nextService"></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Status Motor</div>
+                <div class="stat-value" style="font-size: 1.5rem;" id="motorStatus">-</div>
+                <button class="reset-btn" onclick="resetAll()" style="margin-top: 15px;">Reset Data</button>
+            </div>
+        </div>
+
+        <!-- Daily Checklist -->
+        <div class="maintenance-section daily-checklist">
+            <div class="section-header">
+                <div class="section-title">✅ Checklist Harian</div>
+                <span class="km-badge">SETIAP HARI</span>
+            </div>
+            <ul class="checklist" id="dailyChecklist"></ul>
+        </div>
+
+        <!-- Maintenance Sections -->
+        <div id="maintenanceSections"></div>
+
+        <div class="footer">
+            <p>Honda PCX 160 CBS - Maintenance Tracker</p>
+            <p style="font-size: 0.85rem; margin-top: 10px;">Rawat motormu dengan disiplin untuk performa maksimal 🏍️</p>
+        </div>
+    </div>
+
+    <script>
+        // Data struktur perawatan
+        const maintenanceData = [
+            {
+                id: 'oil',
+                title: 'Ganti Oli Mesin',
+                interval: 2500,
+                warningAt: 2000,
+                icon: '🛢️',
+                priority: 'critical',
+                items: [
+                    { 
+                        id: 'oil_change', 
+                        title: 'Ganti Oli Mesin Full Sintetik',
+                        desc: 'Gunakan oli Honda SPX2 atau setara. Macet membuat oli cepat rusak, jangan tunggu mesin kasar.'
+                    }
+                ]
+            },
+            {
+                id: 'cvt',
+                title: 'Servis CVT + Oli Gardan',
+                interval: 5000,
+                warningAt: 4500,
+                icon: '⚙️',
+                priority: 'high',
+                items: [
+                    { 
+                        id: 'cvt_clean', 
+                        title: 'Bongkar & Bersihkan CVT',
+                        desc: 'Debu CVT bikin tarikan berat & getar. Ini kunci PCX tetap halus & responsif.'
+                    },
+                    { 
+                        id: 'gear_oil', 
+                        title: 'Ganti Oli Gardan',
+                        desc: 'Biasanya diganti bersamaan dengan servis CVT.'
+                    }
+                ]
+            },
+            {
+                id: 'brake',
+                title: 'Cek Kampas Rem',
+                interval: 5000,
+                warningAt: 4000,
+                icon: '🛑',
+                priority: 'critical',
+                items: [
+                    { 
+                        id: 'brake_pad', 
+                        title: 'Periksa Ketebalan Kampas Rem',
+                        desc: 'Macet = rem kerja ekstra. Jangan tunggu bunyi atau rem dalam. Keselamatan nomor satu!'
+                    }
+                ]
+            },
+            {
+                id: 'spark',
+                title: 'Cek/Ganti Busi',
+                interval: 9000,
+                warningAt: 8000,
+                icon: '⚡',
+                priority: 'medium',
+                items: [
+                    { 
+                        id: 'spark_plug', 
+                        title: 'Periksa dan Ganti Busi',
+                        desc: 'Busi sehat = mesin enteng & irit. Busi lemah bikin motor berat & boros.'
+                    }
+                ]
+            },
+            {
+                id: 'filter',
+                title: 'Ganti Filter Udara & Air Radiator',
+                interval: 12000,
+                warningAt: 11000,
+                icon: '🌬️',
+                priority: 'medium',
+                items: [
+                    { 
+                        id: 'air_filter', 
+                        title: 'Ganti Filter Udara',
+                        desc: 'Filter udara langsung ganti, jangan dibersihkan saja.'
+                    },
+                    { 
+                        id: 'coolant', 
+                        title: 'Kuras Air Radiator',
+                        desc: 'Radiator dikuras agar mesin tidak cepat panas.'
+                    }
+                ]
+            },
+            {
+                id: 'tire',
+                title: 'Cek Ban Depan & Belakang',
+                interval: 20000,
+                warningAt: 18000,
+                icon: '🛞',
+                priority: 'high',
+                items: [
+                    { 
+                        id: 'tire_check', 
+                        title: 'Periksa Kondisi Ban',
+                        desc: 'Ban belakang biasanya lebih cepat habis. Kalau alur mulai botak → ganti segera!'
+                    }
+                ]
+            },
+            {
+                id: 'major',
+                title: 'SERVIS BESAR - KM 24.000',
+                interval: 24000,
+                warningAt: 23000,
+                icon: '🔧',
+                priority: 'critical',
+                items: [
+                    { 
+                        id: 'vbelt', 
+                        title: 'Ganti V-Belt',
+                        desc: 'WAJIB! Jangan nekat lewat dari ini, V-Belt putus itu mimpi buruk.'
+                    },
+                    { 
+                        id: 'roller', 
+                        title: 'Ganti Roller CVT',
+                        desc: 'Roller aus membuat akselerasi lemah dan konsumsi BBM meningkat.'
+                    },
+                    { 
+                        id: 'coolant_major', 
+                        title: 'Ganti Air Radiator',
+                        desc: 'Penggantian total air radiator untuk performa pendinginan optimal.'
+                    },
+                    { 
+                        id: 'brake_fluid_major', 
+                        title: 'Ganti Minyak Rem',
+                        desc: 'Minyak rem lama bikin rem terasa kosong. Penting untuk pengereman stabil.'
+                    }
+                ]
+            },
+            {
+                id: 'brake_fluid',
+                title: 'Ganti Minyak Rem',
+                interval: 20000,
+                warningAt: 19000,
+                icon: '🚨',
+                priority: 'high',
+                items: [
+                    { 
+                        id: 'brake_fluid', 
+                        title: 'Ganti Minyak Rem (atau setiap 2 tahun)',
+                        desc: 'Minyak rem lama bikin rem terasa kosong dan kurang responsif.'
+                    }
+                ]
+            }
+        ];
+
+        const dailyTasks = [
+            { 
+                id: 'daily_rain', 
+                title: 'Setelah Hujan / Lewat Genangan',
+                desc: 'Semprot radiator & kaki-kaki pakai air kran. Jangan tunggu besok (tanah bisa mengeras).'
+            },
+            { 
+                id: 'daily_tire', 
+                title: 'Cek Tekanan Ban (Setiap Senin)',
+                desc: 'Ban kurang angin = boros + tarikan berat. Pastikan tekanan sesuai standar.'
+            },
+            { 
+                id: 'daily_warmup', 
+                title: 'Panaskan Motor dengan Benar',
+                desc: 'Panaskan cukup 1 menit sambil pakai helm & sarung tangan. Mesin PCX sudah injeksi pintar.'
+            },
+            { 
+                id: 'daily_service', 
+                title: 'Selalu Bawa Buku Servis ke AHASS',
+                desc: 'Supaya garansi mesin 5 tahun tetap aman dan riwayat perawatan tercatat.'
+            }
+        ];
+
+        // Load data dari localStorage
+        function loadData() {
+            const saved = localStorage.getItem('pcxMaintenance');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return {
+                currentKm: 0,
+                lastUpdate: new Date().toISOString(),
+                completedItems: {},
+                dailyChecklist: {}
+            };
+        }
+
+        // Save data ke localStorage
+        function saveData(data) {
+            localStorage.setItem('pcxMaintenance', JSON.stringify(data));
+        }
+
+        let appData = loadData();
+
+        // Update kilometer
+        function updateKm() {
+            const kmInput = document.getElementById('currentKm');
+            const newKm = parseInt(kmInput.value) || 0;
+            
+            if (newKm < 0) {
+                alert('Kilometer tidak boleh negatif!');
+                return;
+            }
+
+            appData.currentKm = newKm;
+            appData.lastUpdate = new Date().toISOString();
+            saveData(appData);
+            
+            renderAll();
+        }
+
+        // Toggle checklist item
+        function toggleItem(category, itemId) {
+            if (!appData.completedItems[category]) {
+                appData.completedItems[category] = {};
+            }
+            
+            appData.completedItems[category][itemId] = !appData.completedItems[category][itemId];
+            saveData(appData);
+            renderAll();
+        }
+
+        // Toggle daily task
+        function toggleDaily(taskId) {
+            appData.dailyChecklist[taskId] = !appData.dailyChecklist[taskId];
+            saveData(appData);
+            renderAll();
+        }
+
+        // Reset semua data
+        function resetAll() {
+            if (confirm('Apakah Anda yakin ingin mereset semua data? Tindakan ini tidak bisa dibatalkan!')) {
+                localStorage.removeItem('pcxMaintenance');
+                appData = {
+                    currentKm: 0,
+                    lastUpdate: new Date().toISOString(),
+                    completedItems: {},
+                    dailyChecklist: {}
+                };
+                renderAll();
+            }
+        }
+
+        // Get status berdasarkan KM
+        function getStatus(interval, warningAt, currentKm) {
+            const kmSinceLast = currentKm % interval;
+            const kmUntilNext = interval - kmSinceLast;
+
+            if (kmSinceLast >= interval) {
+                return { status: 'danger', text: 'LEWAT JADWAL!', kmUntil: 0 };
+            } else if (kmSinceLast >= warningAt) {
+                return { status: 'warning', text: `${kmUntilNext} km lagi`, kmUntil: kmUntilNext };
+            } else {
+                return { status: 'ok', text: `${kmUntilNext} km lagi`, kmUntil: kmUntilNext };
+            }
+        }
+
+        // Render daily checklist
+        function renderDailyChecklist() {
+            const container = document.getElementById('dailyChecklist');
+            container.innerHTML = '';
+
+            dailyTasks.forEach(task => {
+                const isCompleted = appData.dailyChecklist[task.id] || false;
+                
+                const li = document.createElement('li');
+                li.className = `checklist-item ${isCompleted ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="checkbox" ${isCompleted ? 'checked' : ''} 
+                               onchange="toggleDaily('${task.id}')">
+                    </div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">${task.title}</div>
+                        <div class="checklist-desc">${task.desc}</div>
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        // Render maintenance sections
+        function renderMaintenance() {
+            const container = document.getElementById('maintenanceSections');
+            const alertContainer = document.getElementById('alerts');
+            container.innerHTML = '';
+            alertContainer.innerHTML = '';
+
+            let overdueCount = 0;
+            let dueSoonCount = 0;
+
+            maintenanceData.forEach(section => {
+                const status = getStatus(section.interval, section.warningAt, appData.currentKm);
+                
+                if (status.status === 'danger') overdueCount++;
+                if (status.status === 'warning') dueSoonCount++;
+
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = `maintenance-section ${status.status === 'danger' ? 'overdue' : ''} ${status.status === 'warning' ? 'due-soon' : ''}`;
+                
+                let itemsHtml = '';
+                let completedCount = 0;
+                
+                section.items.forEach(item => {
+                    const isCompleted = appData.completedItems[section.id]?.[item.id] || false;
+                    if (isCompleted) completedCount++;
+                    
+                    itemsHtml += `
+                        <li class="checklist-item ${isCompleted ? 'completed' : ''}">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" class="checkbox" ${isCompleted ? 'checked' : ''} 
+                                       onchange="toggleItem('${section.id}', '${item.id}')">
+                            </div>
+                            <div class="checklist-content">
+                                <div class="checklist-title">${item.title}</div>
+                                <div class="checklist-desc">${item.desc}</div>
+                            </div>
+                        </li>
+                    `;
+                });
+
+                const progress = (completedCount / section.items.length) * 100;
+
+                sectionDiv.innerHTML = `
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">${section.icon} ${section.title}</div>
+                            <div class="km-info">
+                                <span class="km-badge">Setiap ${section.interval.toLocaleString()} KM</span>
+                                <span class="status-badge ${status.status}">${status.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="checklist">
+                        ${itemsHtml}
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="progress-text">${completedCount}/${section.items.length} selesai (${Math.round(progress)}%)</div>
+                `;
+                
+                container.appendChild(sectionDiv);
+            });
+
+            // Tampilkan alert jika ada yang overdue
+            if (overdueCount > 0) {
+                const alert = document.createElement('div');
+                alert.className = 'alert-box';
+                alert.innerHTML = `
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <h3>PERHATIAN!</h3>
+                        <p>Ada ${overdueCount} perawatan yang sudah melewati jadwal. Segera ke bengkel AHASS!</p>
+                    </div>
+                `;
+                alertContainer.appendChild(alert);
+            }
+        }
+
+        // Render statistics
+        function renderStats() {
+            // Update current KM display
+            document.getElementById('currentKm').value = appData.currentKm;
+            
+            // Update last update time
+            const lastUpdate = new Date(appData.lastUpdate);
+            document.getElementById('lastKmUpdate').textContent = 
+                `Terakhir update: ${lastUpdate.toLocaleDateString('id-ID')} ${lastUpdate.toLocaleTimeString('id-ID')}`;
+
+            // Calculate total completed items
+            let totalItems = 0;
+            let completedItems = 0;
+            
+            maintenanceData.forEach(section => {
+                totalItems += section.items.length;
+                section.items.forEach(item => {
+                    if (appData.completedItems[section.id]?.[item.id]) {
+                        completedItems++;
+                    }
+                });
+            });
+
+            document.getElementById('completedCount').textContent = completedItems;
+            
+            const overallProgress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+            document.getElementById('overallProgress').style.width = overallProgress + '%';
+            document.getElementById('progressText').textContent = Math.round(overallProgress) + '%';
+
+            // Find next service
+            let nextService = null;
+            let minKm = Infinity;
+            
+            maintenanceData.forEach(section => {
+                const status = getStatus(section.interval, section.warningAt, appData.currentKm);
+                if (status.kmUntil < minKm && status.kmUntil > 0) {
+                    minKm = status.kmUntil;
+                    nextService = section.title;
+                }
+            });
+
+            document.getElementById('upcomingCount').textContent = minKm === Infinity ? '-' : minKm;
+            document.getElementById('nextService').textContent = nextService ? `Berikutnya: ${nextService}` : 'Semua terjadwal';
+
+            // Motor status
+            let status = '🟢 Sangat Baik';
+            if (appData.currentKm > 0) {
+                const overdueItems = maintenanceData.filter(s => {
+                    const st = getStatus(s.interval, s.warningAt, appData.currentKm);
+                    return st.status === 'danger';
+                });
+                
+                if (overdueItems.length > 0) {
+                    status = '🔴 Perlu Servis';
+                } else if (minKm < 500) {
+                    status = '🟡 Segera Servis';
+                }
+            }
+            
+            document.getElementById('motorStatus').textContent = status;
+        }
+
+        // Render all
+        function renderAll() {
+            renderStats();
+            renderDailyChecklist();
+            renderMaintenance();
+        }
+
+        // Initialize
+        renderAll();
+    </script>
+</body>
+</html>
